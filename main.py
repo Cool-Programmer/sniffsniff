@@ -32,7 +32,34 @@ def main():
             print(TAB_1 + 'IPv4 Packet: ')
             print(TAB_2 + 'Version: {}, Header Length: {}, TTL: {}' . format(version, header_length, ttl))
             print(TAB_3 + 'Protocol: {}, Source: {}, Target: {}'.format(proto, src, target))
+            if proto == 1:
+                (icmp_type, code, checksum, data) = icmp_packet(data)
+                print(TAB_1 + 'ICMP Packet: ')
+                print(TAB_2 + 'Type: {}, Code: {}, Checksum: {}' . format(icmp_type, code, checksum))
+                print(TAB_2 + 'Data: ')
+                print(format_multi_line(DATA_TAB_3, data))
 
+            elif proto == 6:
+                (src_port, dest_port, sequence, acknoledgement, flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fyn, data) = tcp_segment(data)
+                print(TAB_1 + 'TCP Segment: ')
+                print(TAB_2 + 'Source Port: {}, Destination Port: {}'.format(src_port, dest_port))
+                print(TAB_2 + 'Sequence: {}, Acknoledgement: {}'.format(sequence, acknoledgement))
+                print(TAB_2 + 'Flags: ')
+                print(TAB_3 + 'URG: {}, ACK: {}, PSH: {}, RST: {}, SYN: {}, FYN: {}' . format(flag_urg, flag_ack, flag_psh, flag_rst, flag_syn, flag_fyn))
+                print(TAB_2 + 'Data: ')
+                print(format_multi_line(DATA_TAB_3, data))
+
+            elif proto == 17:
+                src_port, dest_port, length, data = udp_segment(data)
+                print(TAB_1 + 'UDP Segment: ')
+                print(TAB_2 + 'Source Port: {}, Destination Port: {}, Length: {}'.format(src_port, dest_port, size))
+
+            else:
+                print(TAB_1 + 'Data: ')
+                print(format_multi_line(DATA_TAB_2, data))
+        else:
+            print('Data: ')
+            print(format_multi_line(DATA_TAB_1, data))
 
 # Unpack ethernet frame
 # If you don't understand what's going on, please refer to https://en.wikipedia.org/wiki/Endianness
@@ -87,9 +114,5 @@ def format_multi_line(prefix, string, size = 80):
         if size % 2:
             size -= 1
     return  '\n' . join([prefix + line for line in textwrap.wrap(string, size)])
-
-
-
-
 
 main()
